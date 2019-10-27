@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Juego: restar</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        
+        <style>
+            
+            @import url('https://fonts.googleapis.com/css?family=Quicksand');
+            
+            body
+            {
+                font-family: 'Quicksand', sans-serif;
+                font-size: 24px;
+            }
+            
+            .container
+            {
+                width: 80%;
+                margin: auto;
+                text-align: center;
+            }
+            
+            .operation-panel
+            {
+                font-size: 3em;
+            }
+            
+            .game-button {
+                font-size: 1em;
+                padding: 0.75em;
+                background: #ccf;
+                border: 3px outset #777;
+                text-align: center;
+                width: 100%;
+                border-radius: 15px;
+                outline: none;
+            }
+            
+            #main-panel {
+                height: 100px;
+            }
+            
+            
+            #game-panel {
+                display: none;
+                
+            }
+            
+            .debug-panel
+            {
+                display: none;
+            }            
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="page-header">Resta</h1>
+            
+            
+            <div id="main-panel">
+                <div class="message-panel" id="message"></div>
+                <button type="button" class="btn btn-info" id="regenerate">Nueva partida</button>
+            </div>
+            
+            
+            <div id="game-panel">
+                
+                <div class="scoreboard row">
+                    <div class="col-xs-6">
+                        <p><strong>Puntuación</strong></p>
+                        <p id="score">0</p>
+                    </div>
+                    <div class="col-xs-6">
+                        <p><strong>Tiempo</strong></p>
+                        <p id="time">0</p>
+                    </div>
+                </div>
+                
+                
+            <div class="operation-panel">
+                <div>
+                    <span id="num1">1</span>
+                    -
+                    <span id="num2">1</span>
+                </div>
+                <div>
+                    =
+                    <span id="answer"></span>
+                </div>
+            </div>
+            
+            <div class="button-container row">
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice1">1</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice2">2</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice3">3</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice4">4</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice5">5</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice6">6</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice7">7</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice8">8</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice9">9</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choiceDelete"><i class="glyphicon glyphicon-triangle-left"></i></button>
+                </div>
+                
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choice0">0</button>
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="game-button" id="choiceAnswer"><i class="glyphicon glyphicon-ok-sign"></i></button>
+                </div>
+            </div>
+                
+            </div>
+            
+            <div class="debug-panel">
+                <div>Result: <span id="result">0</span></div>
+            </div>
+            
+        </div>
+        <script
+			  src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        
+        <script>
+            
+            $(document).ready(function()
+            {
+                
+                var game = {
+                    
+                    'isRunning': false,
+                    'context': this,
+                    'control_buttons': {
+                        'option1': $('#choice1'),
+                        'option2': $('#choice2'),
+                        'option3': $('#choice3'),
+                        'option4': $('#choice4'),
+                        'option5': $('#choice5'),
+                        'option6': $('#choice6'),
+                        'option7': $('#choice7'),
+                        'option8': $('#choice8'),
+                        'option9': $('#choice9'),
+                        'delete': $('#choiceDelete'),
+                        'answer': $('#choiceAnswer'),
+                        'regenerate': $('#regenerate')
+                    },
+                    'placeholders': {
+                        'numberPanel1': $('#num1'),
+                        'numberPanel2': $('#num2'),
+                        'answer': $('#answer'),
+                        'result': $('#result'),
+                        'score': $('#score'),
+                        'time': $('#time'),
+                        'message': $('#message'),
+                        'main_panel': $('#main-panel'),
+                        'game_panel': $('#game-panel')
+                    },
+                    'current': {
+                        'num1': 12,
+                        'num2': 7,
+                        'answer': '',
+                        'time': 5,
+                        'delete': function()
+                        {
+                            if(this.answer.length > 0)
+                            {
+                                this.answer = this.answer.substring(1);
+                            }
+                        },
+                        'append': function(n)
+                        {
+                            if(this.answer.length < game.getLevel())
+                            {
+                                this.answer += n;
+                                return true;
+                            }
+                            
+                            return false;
+                            
+                        }
+                    },
+                    'score': 0,
+                    'restart': function()
+                    {
+                        this.initialize();
+                    },
+                    'initialize': function()
+                    {
+                        this.score = 0;
+                        this.update();
+                        this.placeholders.main_panel.slideUp();
+                        this.placeholders.game_panel.show('fade', 1000, function(){
+                            game.isRunning = true;
+                        });
+                    },
+                    'generate': function()
+                    {
+                        let prev1 = this.current.num1;
+                        let prev2 = this.current.num2;
+                        let top = this.getNumberTop();
+                        
+                        
+                        while(this.current.num1 === prev1 || this.current.num1 <= 1)
+                        {
+                            this.current.num1 = Math.ceil(Math.random() * top);
+                        }
+                        
+                        while(this.current.num2 === prev2)
+                        {
+                            console.log(this.current.num2 + "\n");
+                            this.current.num2 = Math.ceil(Math.random() * this.current.num1);
+                        }
+                        
+                        this.current.answer = '';
+                        this.current.time = this.getAssignableTime();
+                    },
+                    'update': function()
+                    {
+                        this.generate();
+                        this.render();
+                    },
+                    'getCurrentResult': function()
+                    {
+                        return this.current.num1 - this.current.num2;
+                    },
+                    'render': function()
+                    {
+                        this.placeholders.numberPanel1.html(this.current.num1);
+                        this.placeholders.numberPanel2.html(this.current.num2);
+                        this.placeholders.result.html(this.getCurrentResult());
+                        this.placeholders.time.html(this.current.time);
+                        this.placeholders.score.html(this.score);
+                        this.placeholders.answer.html(this.current.answer);
+                    },
+                    'elapse': function(){
+                        this.current.time--;
+                        this.placeholders.time.html(this.current.time);
+                        if(this.current.time === 0)
+                        {
+                            this.game_over('¡Se acabó el tiempo!');
+                        }
+                    },
+                    'answer': function(choice)
+                    {
+                        let answer = parseInt(this.current.answer);
+                        
+                        if(answer === this.getCurrentResult())
+                        {
+                            this.success();
+                            return true;
+                        }
+                        else
+                        {
+                            this.game_over('¡Respuesta incorrecta!');
+                            return false;
+                        }
+                    },
+                    'success': function()
+                    {
+                        this.score += this.current.time * this.getLevel();
+                        this.update();
+                        
+                    },
+                    'game_over': function(message = '')
+                    {
+                        this.isRunning = false;
+                        this.placeholders.message.html("Fin del juego<br/>" + message);
+                        this.placeholders.main_panel.slideDown();
+                        this.placeholders.game_panel.hide('fade', 1000);
+                    },
+                    'getAssignableTime': function()
+                    {
+                        //10 segundos y uno menos por cada 500 puntos
+                        return 10 - Math.floor(this.score / 500);
+                    },
+                    'getLevel': function()
+                    {
+                        switch(true)
+                        {
+                            case this.score > 1000:
+                                return 6;
+                            case this.score > 600:
+                                return 5;
+                            case this.score > 300:
+                                return 4;
+                            case this.score > 120:
+                                return 3;
+                            case this.score > 50:
+                                return 2;
+                            default:
+                                return 1;
+                        }
+                    },
+                    'getNumberTop': function()
+                    {
+                        let top = '';
+                        
+                        for(let i = 0; i < this.getLevel(); i++)
+                        {
+                            top += '9';
+                        }
+                        
+                        return parseInt(top);
+                    }
+                };
+                
+                
+                $('#regenerate').on('click', function()
+                {
+                    game.restart();
+                });
+                
+                $('.game-button').on('click', function()
+                {
+                    if(game.isRunning)
+                    {
+                        let command = $(this).attr('id').substring(6);
+                        
+                        let highlightColor = '#cfc';
+                        
+                        switch(command)
+                        {
+                            case 'Delete':
+                                game.current.delete();
+                                game.placeholders.answer.html(game.current.answer);
+                                
+                                break;
+                            case 'Answer':
+                                if(game.answer())
+                                {
+                                    game.update();   
+                                }
+                                else
+                                {
+                                    highlightColor = '#fcc';
+                                }
+                                break;
+                            default:
+                                if(game.current.append(command))
+                                {
+                                    game.placeholders.answer.html(game.current.answer);
+                                }
+                                else
+                                {
+                                    highlightColor = '#fcc';
+                                }
+                            
+                        }
+                        
+                        $(this).effect('highlight', {color: highlightColor}, 250);
+                        //$(this).effect("highlight", 400);
+                      
+                    }  
+                });
+                
+                window.setInterval(function(){
+                   if(game.isRunning)
+                   {
+                      game.elapse(); 
+                   }
+                }, 1000);
+                
+                
+                game.update();
+                
+            });
+            
+        </script>
+    </body>
+</html>

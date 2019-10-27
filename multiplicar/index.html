@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Juego: tablas de multiplicar</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        
+        <style>
+            
+            @import url('https://fonts.googleapis.com/css?family=Quicksand');
+            
+            body
+            {
+                font-family: 'Quicksand', sans-serif;
+                font-size: 24px;
+            }
+            
+            .container
+            {
+                width: 80%;
+                margin: auto;
+                text-align: center;
+            }
+            
+            .operation-panel
+            {
+                font-size: 3em;
+            }
+            
+            .game-button {
+                font-size: 1em;
+                padding: 0.75em;
+                background: #ccf;
+                border: 3px outset #777;
+                text-align: center;
+                width: 100%;
+                border-radius: 15px;
+                outline: none;
+            }
+            
+            #main-panel {
+                height: 100px;
+            }
+            
+            
+            #game-panel {
+                display: none;
+            }
+            
+            .debug-panel
+            {
+                display: none;
+            }            
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="page-header">Multiplicación</h1>
+            
+            
+            <div id="main-panel">
+                <div class="message-panel" id="message"></div>
+                <button type="button" class="btn btn-info" id="regenerate">Nueva partida</button>
+            </div>
+            
+            
+            <div id="game-panel">
+                
+                <div class="scoreboard row">
+                    <div class="col-xs-6">
+                        <p><strong>Puntuación</strong></p>
+                        <p id="score">0</p>
+                    </div>
+                    <div class="col-xs-6">
+                        <p><strong>Tiempo</strong></p>
+                        <p id="time">0</p>
+                    </div>
+                </div>
+                
+                
+            <div class="operation-panel">
+                <span id="num1">1</span>
+                x
+                <span id="num2">1</span>
+            </div>
+            
+            <div class="button-container row">
+                <div class="col-md-4">
+                    <button type="button" class="game-button" id="choice1">Opción 1</button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="game-button" id="choice2">Opción 2</button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="game-button" id="choice3">Opción 3</button>
+                </div>
+            </div>
+                
+            </div>
+            
+            <div class="debug-panel">
+                <div>Result: <span id="result">0</span></div>
+            </div>
+            
+        </div>
+        
+        <script src="js/libs/jquery/jquery.min.js" type="text/javascript"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        
+        <script>
+            $(document).ready(function()
+            {
+                
+                var game = {
+                    'isRunning': false,
+                    'context': this,
+                    'control_buttons': {
+                        'option1': $('#choice1'),
+                        'option2': $('#choice2'),
+                        'option3': $('#choice3'),
+                        'regenerate': $('#regenerate')
+                    },
+                    'placeholders': {
+                        'numberPanel1': $('#num1'),
+                        'numberPanel2': $('#num2'),
+                        'result': $('#result'),
+                        'score': $('#score'),
+                        'time': $('#time'),
+                        'message': $('#message'),
+                        'main_panel': $('#main-panel'),
+                        'game_panel': $('#game-panel')
+                    },
+                    'current': {
+                        'num1': 3,
+                        'num2': 7,
+                        'time': 5
+                    },
+                    'score': 0,
+                    'choices': {
+                        'choice1': 0,
+                        'choice2': 0,
+                        'choice3': 0,
+                        'contains': function(n)
+                        {
+                            return this.choice1 === n || this.choice2 === n || this.choice3 === n;
+                        }
+                    },
+                    'restart': function()
+                    {
+                        this.initialize();
+                    },
+                    'initialize': function()
+                    {
+                        this.score = 0;
+                        this.update();
+                        this.placeholders.main_panel.slideUp();
+                        this.placeholders.game_panel.show('fade', 1000, function(){
+                            game.isRunning = true;
+                        });
+                    },
+                    'generate': function()
+                    {
+                        let prev1 = this.current.num1;
+                        let prev2 = this.current.num2;
+                        
+                        while(this.current.num1 === prev1)
+                        {
+                            this.current.num1 = Math.ceil(Math.random() * 10);
+                        }
+                        
+                        while(this.current.num2 === prev2)
+                        {
+                            this.current.num2 = Math.ceil(Math.random() * 10);
+                        }
+                        
+                        let randomPosition = Math.floor(Math.random() * 3) + 1;
+                        
+                        do
+                        {
+                            if(randomPosition === 1)
+                            {
+                                this.choices.choice1 = this.getCurrentResult();
+                                break;
+                            }
+                            
+                            this.choices.choice1 = Math.ceil(Math.random() * 99);
+                            
+                        }
+                        while(this.choices.choice1 === this.getCurrentResult());
+                        
+                        do
+                        {
+                            if(randomPosition === 2)
+                            {
+                                this.choices.choice2 = this.getCurrentResult();
+                                break;
+                            }
+                            
+                            this.choices.choice2 = Math.ceil(Math.random() * 99);
+                            
+                        }
+                        while(this.choices.choice2 === this.getCurrentResult() || this.choices.choice1 === this.choices.choice2);
+                        
+                        do
+                        {
+                            if(randomPosition === 3)
+                            {
+                                this.choices.choice3 = this.getCurrentResult();
+                                break;
+                            }
+                            
+                            this.choices.choice3 = Math.ceil(Math.random() * 99);
+                            
+                        }
+                        while(this.choices.choice3 === this.getCurrentResult() 
+                                || this.choices.choice1 === this.choices.choice3 
+                                || this.choices.choice2 === this.choices.choice3);
+                        
+                        this.current.time = this.getAssignableTime();
+                    },
+                    'update': function()
+                    {
+                        this.generate();
+                        this.render();
+                    },
+                    'getCurrentResult': function()
+                    {
+                        return this.current.num1 * this.current.num2;
+                    },
+                    'render': function()
+                    {
+                        this.placeholders.numberPanel1.html(this.current.num1);
+                        this.placeholders.numberPanel2.html(this.current.num2);
+                        this.placeholders.result.html(this.getCurrentResult());
+                        this.control_buttons.option1.html(this.choices.choice1);
+                        this.control_buttons.option2.html(this.choices.choice2);
+                        this.control_buttons.option3.html(this.choices.choice3);
+                        this.placeholders.time.html(this.current.time);
+                        this.placeholders.score.html(this.score);
+                    },
+                    'elapse': function(){
+                        this.current.time--;
+                        this.placeholders.time.html(this.current.time);
+                        if(this.current.time === 0)
+                        {
+                            this.game_over('¡Se acabó el tiempo!');
+                        }
+                    },
+                    'answer': function(choice)
+                    {
+                        let answer = this.choices[choice];
+                        
+                        if(answer === this.getCurrentResult())
+                        {
+                            this.success();
+                        }
+                        else
+                        {
+                            this.game_over('¡Respuesta incorrecta!');
+                        }
+                    },
+                    'success': function()
+                    {
+                        this.score += this.current.time * this.getScoreMultiplier();
+                        this.update();
+                        
+                    },
+                    'game_over': function(message = '')
+                    {
+                        this.isRunning = false;
+                        this.placeholders.message.html("Fin del juego<br/>" + message + "<br/>Puntuación: " + this.score);
+                        this.placeholders.main_panel.slideDown();
+                        this.placeholders.game_panel.hide('fade', 1000);
+                    },
+                    'getAssignableTime': function()
+                    {
+                        switch(true)
+                        {
+                            case this.score > 200:
+                                return 2;
+                            case this.score > 100:
+                                return 3;
+                            case this.score > 50:
+                                return 4;
+                            default:
+                                return 5;
+                        }
+                    },
+                    'getScoreMultiplier': function()
+                    {
+                        switch(true)
+                        {
+                            case this.score > 200:
+                                return 5;
+                            case this.score > 100:
+                                return 3;
+                            case this.score > 50:
+                                return 2;
+                            default:
+                                return 1;
+                        }
+                    }
+                    
+                };
+                
+                
+                $('#regenerate').on('click', function()
+                {
+                    game.restart();
+                });
+                
+                $('.game-button').on('click', function()
+                {
+                    if(game.isRunning)
+                    {
+                        let btnId = $(this).attr('id');
+                        
+                        $(this).effect('highlight', {color: '#cfc'}, 250);
+                        //$(this).effect("highlight", 400);
+                      
+                        game.answer(btnId);
+                    }  
+                });
+                
+                window.setInterval(function(){
+                   if(game.isRunning)
+                   {
+                       game.elapse(); 
+                   }
+                }, 1000);
+                
+                
+                game.update();
+                
+            });
+            
+        </script>
+    </body>
+</html>

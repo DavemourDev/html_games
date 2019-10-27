@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Juego: números romanos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <style>
+
+            @import url('https://fonts.googleapis.com/css?family=Quicksand');
+            @import url('https://fonts.googleapis.com/css?family=Quattrocento');
+
+            body
+            {
+                font-family: 'Quicksand', sans-serif;
+                font-size: 24px;
+
+            }
+
+            .container
+            {
+                width: 80%;
+                margin: auto;
+                text-align: center;
+            }
+
+            .operation-panel
+            {
+                font-size: 3em;
+            }
+
+            .game-button {
+                font-size: 0.75em;
+                padding: 0.5em;
+                background: #ccf;
+                border: 3px outset #777;
+                text-align: center;
+                width: 100%;
+                border-radius: 15px;
+                outline: none;
+                margin: 0.25em;
+            }
+
+            #main-panel {
+                height: 100px;
+            }
+
+            #game-panel {
+                display: none;
+            }
+
+            #debug-panel
+            {
+                display: none;
+            }    
+
+            .memory {
+                height: 70px;
+            }
+
+            .flex-v
+            {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .roman {
+                font-family: 'Quattrocento', serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="page-header">Números romanos</h1>
+
+            <div id="menu-panel">
+                <div class="well">
+                    <p id="message"></p>
+                    <button id="start">
+                        Nueva partida
+                    </button>
+                    <form>
+                        <div class="form-group">
+                            <h2>Modo de juego</h2>
+                            <select id="game-mode" class="form-control">
+                                <option value="1">Arábico &rarr; Romano</option>
+                                <option value="2">Romano &rarr; Arábico</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="game-panel">
+                <div class="well board">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="flex-v"><b>Puntuación</b><span id="score"></span></div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="flex-v"><b>Tiempo</b><span id="time"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="well">
+                    <span id="number"></span> = <span id="user-number"></span>
+                </div>
+                <div class="button-panel well">
+                    <div class="row roman" id="ntor-panel">
+                        <div class="col-xs-4 col-sm-3 col sm-4">
+                            <button class="game-button">I</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">V</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">X</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">L</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">C</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">D</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">M</button>
+                        </div>
+                        <div class="col-xs-8 col-sm-3">
+                            <button class="game-button" id="delete"><i class="glyphicon glyphicon-triangle-left"></i></button>
+                        </div>
+                        <div class="col-xs-12">
+                            <button class="game-button" id="resolve"><i class="glyphicon glyphicon-ok-sign"></i></button>
+                        </div>
+                    </div>
+                    <div class="row roman" id="rton-panel">
+                        <div class="col-xs-4 col-sm-3 col sm-4">
+                            <button class="game-button">1</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">2</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">3</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">4</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">5</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">6</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">7</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">8</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">9</button>
+                        </div>
+                        <div class="col-xs-4 col-sm-3">
+                            <button class="game-button">0</button>
+                        </div>
+                        <div class="col-xs-8 col-sm-3">
+                            <button class="game-button" id="delete"><i class="glyphicon glyphicon-triangle-left"></i></button>
+                        </div>
+                        <div class="col-xs-12">
+                            <button class="game-button" id="resolve"><i class="glyphicon glyphicon-ok-sign"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="debug-panel">
+                <button id="debug-render">Renderizar</button>
+            </div>
+
+        </div>
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+        <script>
+            $(document).ready(function ()
+            {
+                var convertToRoman = function (num)
+                {
+
+                    let romanTable = {M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1},
+                            roman = '';
+                    for (let r in romanTable)
+                    {
+                        while (num >= romanTable[r])
+                        {
+                            roman += r;
+                            num -= romanTable[r];
+                        }
+                    }
+                    return roman;
+                };
+
+
+                var game = {
+                    isRunning: false,
+                    options: {
+                        mode: 1
+                    },
+                    elements: {
+                        startBtn: $('#start'),
+                        renderBtn: $('#debug-render'),
+                        gameBtn: $('.game-button'),
+                        number: $('#number'),
+                        userNumber: $('#user-number'),
+                        score: $('#score'),
+                        time: $('#time'),
+                        message: $('#message'),
+                        gamePanel: $('#game-panel'),
+                        gameMode: $('#game-mode'),
+                        ntorPanel: $('#ntor-panel'),
+                        rtonPanel: $('#rton-panel'),
+                        menuPanel: $('#menu-panel')
+                    },
+                    init: function ()
+                    {
+                        this.score = 0;
+                        
+                        switch(this.options.mode)
+                        {
+                            case 1:
+                                this.elements.ntorPanel.show();
+                                this.elements.rtonPanel.hide();
+                                break;
+                            case 2:
+                                this.elements.ntorPanel.hide();
+                                this.elements.rtonPanel.show();
+                                break;
+                        }
+                        
+                        this.isRunning = true;
+                        
+                        this.elements.menuPanel.slideUp();
+                        this.elements.gamePanel.slideDown(function () {
+                            game.next();
+                        });
+                    },
+                    current: {
+                        number: 0,
+                        userNumber: '',
+                        time: 7
+                    },
+                    interval: null,
+                    clearInterval: function ()
+                    {
+                        clearInterval(function ()
+                        {
+                            game.interval;
+                        });
+                    },
+                    next: function ()
+                    {
+                        if (this.interval !== null)
+                        {
+                            clearInterval(this.interval);
+                        }
+                        this.current.userNumber = '';
+                        this.current.time = 10;
+                        this.generateNumber();
+                        this.interval = setInterval(function ()
+                        {
+                            game.elapse();
+                        }, 1000);
+                        this.render();
+                    },
+                    generateNumber: function ()
+                    {
+                        let num = this.current.number;
+                        let anterior = num;
+
+                        while (num === anterior)
+                        {
+                            num = Math.ceil(Math.random() * this.getCapNumber());
+                        }
+
+                        this.current.number = this.options.mode === 1 ? num : convertToRoman(num);
+                    },
+                    score: 0,
+                    elapse: function ()
+                    {
+                        if (this.isRunning)
+                        {
+                            this.current.time--;
+                            this.elements.time.html(this.current.time);
+                            if (this.current.time === 0)
+                            {
+                                this.gameOver('¡Se acabó el tiempo!');
+                            }
+                        }
+                    },
+                    gameOver: function (message)
+                    {
+                        this.isRunning = false;
+                        this.setMessage("¡Fin del juego!<br/>" + message);
+                        this.elements.gamePanel.slideUp(function ()
+                        {
+                            game.elements.menuPanel.slideDown();
+                        });
+                    },
+                    resolve: function ()
+                    {
+                        let comprove;
+                        
+                        
+                        switch(this.options.mode)
+                        {
+                            case 1:
+                                comprove = convertToRoman(this.current.number) === this.current.userNumber;
+                                break;
+                            case 2:
+                                comprove = this.current.number === convertToRoman(this.current.userNumber);
+                                break;
+                        }
+                        
+                        if (comprove)
+                        {
+                            this.assert();
+                            return true;
+                        } else
+                        {
+                            this.gameOver('¡Fallaste!');
+                        }
+                    },
+                    addChar: function (char) {
+                        this.current.userNumber += char;
+                    },
+                    deleteLastChar: function ()
+                    {
+                        if (this.current.userNumber.length === 0)
+                        {
+                            return false;
+                        }
+
+                        this.current.userNumber = this.current.userNumber.slice(0, -1);
+                        return true;
+                    },
+                    assert: function ()
+                    {
+                        this.score += this.getScoreGain();
+                        this.next();
+
+                    },
+                    render: function (field = null)
+                    {
+                        if (field === null)
+                        {
+                            this.elements.number.html(this.current.number);
+                            this.elements.userNumber.html(this.current.userNumber);
+                            this.elements.time.html(this.current.time);
+                            this.elements.score.html(this.score);
+                        } else
+                        {
+                            if (this.current[field] !== undefined)
+                                this.elements[field].html(this.current[field]);
+                    }
+                    },
+                    setMessage: function (message)
+                    {
+                        this.elements.message.html(message);
+                    },
+                    getScoreGain: function ()
+                    {
+                        return this.getDifficulty() * this.current.time;
+                    },
+                    getDifficulty: function ()
+                    {
+                        switch (true)
+                        {
+                            case this.score > 300:
+                                return 4;
+                            case this.score > 150:
+                                return 3;
+                            case this.score > 50:
+                                return 2;
+                            default:
+                                return 1;
+                        }
+                    },
+                    getCapNumber: function ()
+                    {
+                        switch (this.getDifficulty())
+                        {
+                            case 1:
+                                return 9;
+                            case 2:
+                                return 89;
+                            case 3:
+                                return 899;
+                            case 4:
+                                return 3999;
+                        }
+                    }
+                };
+
+                game.elements.renderBtn.on('click', function ()
+                {
+                    game.render();
+                });
+
+                game.elements.gameBtn.on('click', function ()
+                {
+
+                    let highlightColor = '#cfc';
+
+                    let command = $(this).attr("id") || $(this).html();
+
+
+
+                    switch (command)
+                    {
+                        case 'delete':
+                            if (!game.deleteLastChar())
+                            {
+                                highlightColor = '#fcc';
+                            } else
+                            {
+                                game.render('userNumber');
+                            }
+                            break;
+                        case 'resolve':
+                            if (!game.resolve())
+                            {
+                                highlightColor = '#fcc';
+                            }
+                            break;
+                        default:
+                            let char = command;
+                            game.addChar(char);
+                            game.render('userNumber');
+                    }
+
+
+                    $(this).effect('highlight', {color: highlightColor}, 250);
+                });
+
+                game.elements.startBtn.on('click', function ()
+                {
+                    game.init();
+                });
+
+                game.elements.gameMode.on('change', function()
+                {
+                    game.options.mode = parseInt($(this).val());
+                });
+
+
+            });
+
+        </script>
+    </body>
+</html>
